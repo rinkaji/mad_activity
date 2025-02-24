@@ -13,7 +13,7 @@ class MainScreen extends StatelessWidget {
   late Realm realm;
   late RealmResults<Product> items;
   void initRealm() {
-    var config = Configuration.local([Product.schema], schemaVersion: 2);
+    var config = Configuration.local([Product.schema], schemaVersion: 3);
     realm = Realm(config);
     loadProducts();
   }
@@ -45,17 +45,21 @@ class MainScreen extends StatelessWidget {
               itemCount: items.length,
               itemBuilder: (BuildContext context, int index) {
                 var myItem = items[index];
-                return Card(
-                  child: ListTile(
-                    title: Text(myItem.name),
-                    subtitle: Text(myItem.price.toString()),
-                    leading:
-                        myItem.isFav == false
-                            ? Icon(Icons.favorite_border_outlined)
-                            : Icon(Icons.favorite),
-                    trailing: IconButton(
-                      onPressed: null,
-                      icon: Icon(Icons.shopping_cart),
+                return Dismissible(
+                  key: UniqueKey(),
+                  onDismissed: null,
+                  child: Card(
+                    child: ListTile(
+                      title: Text(myItem.name),
+                      subtitle: Text(myItem.price.toString()),
+                      leading:
+                          myItem.isFav == false
+                              ? Icon(Icons.favorite_border_outlined)
+                              : Icon(Icons.favorite),
+                      trailing: IconButton(
+                        onPressed: null,
+                        icon: Icon(Icons.shopping_cart),
+                      ),
                     ),
                   ),
                 );
@@ -89,6 +93,12 @@ class MainScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  void delete(Product p) {
+    realm.write(() {
+      realm.delete(p);
+    });
   }
 
   void add(BuildContext context) {
